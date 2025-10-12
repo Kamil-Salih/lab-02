@@ -33,6 +33,7 @@ def parse_auth_line(line):
     try:
         ts = datetime.strptime(f"2025 {ts_str}", "%Y %b %d %H:%M:%S")
     except Exception:
+        print("Failed to parse timestamp:", line.strip()) #new change!!
         ts = None
     ip = None
     event_type = "other"
@@ -63,6 +64,18 @@ if __name__ == "__main__":
     # quick print
     for ip, times in per_ip_timestamps.items():
         print(ip, len(times))
+
+    print("\n")
+    
+    per_ip_readable_timestamps = {}  # Added part!
+    for ip_address, timestamps in per_ip_timestamps.items():
+        per_ip_readable_timestamps[ip_address] = []
+        for dt in timestamps:  #dt is short for datetime
+            per_ip_readable_timestamps[ip_address].append(dt.strftime("%b %d %H:%M:%S"))
+
+    print(json.dumps(per_ip_readable_timestamps, indent=2))
+
+
 
 
 for ip, times in per_ip_timestamps.items():
@@ -119,6 +132,11 @@ with open('failed_counts.txt', 'w') as f1:
         f1.write(f"{ip},{failed_count}\n")
 
 
+with open("bruteforce_incidents.txt", "w") as f: #New change!
+    json.dump(incidents, f, indent=2)
+print("\n")
+print(f"Saved {len(incidents)} incidents to bruteforce_incidents.txt")
+
 
 
 for ip, failed_count in top_10_attacker_ips:
@@ -134,3 +152,4 @@ plt.ylabel("Failed attempts")
 plt.tight_layout()
 plt.savefig("top_attackers.png")
 plt.show()
+
